@@ -1,0 +1,30 @@
+{%  extends "base.html" %}
+
+{%  block titel %} <title>Home</title> {%  endblock %}
+
+{% block inhalt %}
+<h1>Das ist die Homepage!</h1>
+<div>
+    <h2>Sorting-Algorithmen</h2>
+    <div>
+        <h3>Bubblesort</h3>
+        
+        <form action="" method="get" class="formNumbers">
+            <div>
+                <label for="deinezahlen">Gebe deine Zahlen zum sortieren ein:</label>
+                <input type="text" id="deinezahlen" name="deinezahlen" required>
+            </div>
+            <div>
+                <input type="submit" value="Sortieren">
+            </div>
+        </form>
+    </div>
+    <div>
+        <h3></h3>
+    </div>
+    <h2>Search-Algorithmen</h2>
+    <div>
+        <h3>Dijkstra</h3>
+    </div>
+</div>
+{% endblock %}

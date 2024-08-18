@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {%  block titel %}
+        <title>Base</title>
+    {% endblock %}
+</head>
+<body>
+    <section>
+        {% block inhalt %}
+        <p>Das ist die nicht überschriebene base.html</p>
+        <!--    {%  load static %} <img src="{% static "media/good_job" %}" alt="well done; thumbs up!"> -->
+        {% endblock %}
+    </section>
+</body>
+</html>
