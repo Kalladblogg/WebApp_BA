@@ -4,6 +4,8 @@ import numpy as np
 from OpenGL.GL.shaders import compileProgram, compileShader
 import ctypes
 from bubblesort import bubbleSort
+import subprocess
+import os
 
 
 class App:
@@ -56,18 +58,18 @@ class App:
                 position = 0
 
         #print
-        nr = 0
+        """ nr = 0
         for i in self.all_bars:
             print()
             print("Liste nr. " + str(nr) + " anfang")
             nr = nr + 1
             for j in i:
                 print("POSITION: " + str(j.realPos))
-                print("value: " + str(j.realVal))
+                print("value: " + str(j.realVal)) """
 
+        #delete previously stored media
+        self.delete_media()
             
-            
-        
         # for taking screenshots
         for i in range(len(self.all_bars)):
             #print(str(i) + " screenshot started")
@@ -77,8 +79,11 @@ class App:
 
         #pg.display.flip()
 
+        # for making the video:
+        self.create_video(0.75, "Sorting/videos/video_bubblesort.mp4")
+
         # for making the Pygame window view
-        self.mainLoop()
+        #self.mainLoop()
 
 
     
@@ -215,6 +220,43 @@ class App:
 
         return shader
 
+    def create_video(self, fps, outputFilePath):
+        command = [
+            
+            "ffmpeg",
+            "-framerate", str(fps),
+            "-i", "Sorting/images/screenshot_%d.png",
+            #"-filter_complex",
+            #f"[0:v]fps={fps}[out]",
+            #"-map", "[out]",
+            "-c:v", "libx264",
+            "-crf", "18",
+            "-pix_fmt", "yuv420p",
+            #"-t", "60",
+            outputFilePath
+
+            #ffmpeg -loop 1 -i image.png -c:v libx264 -t 15 -pix_fmt yuv420p -vf scale=320:240 out.mp4
+        ]
+        subprocess.run(command, check = True)
+
+
+    def delete_media(self):
+        imgPath = "Sorting/images/"
+        vidPath = "Sorting/videos/"
+        mediaPaths = []
+        mediaPaths.extend([imgPath, vidPath])
+
+        try:
+            for directory in mediaPaths:
+                for item in os.listdir(directory):
+                    itemPath = os.path.join(directory, item)
+                    if os.path.isfile(itemPath):
+                        os.remove(itemPath)
+            print("All previously recorded media has been successfully deleted.")
+        except Exception as e:
+            print(f"Error when trying to delete directory {directory}: " + str(e))
+
+
 
     def quit(self):
         
@@ -285,15 +327,29 @@ class Bar:
         #fordebugging
         self.realVal = value
         self.realPos = position
-        
+
+        #calculate position on x-Axis; 
+        # space between each bar is 0.1, value increments are 0.015
         self.position = -0.8 + (position * 0.1)
         self.value = -0.8 + (value * 0.015)
 
+        # create different color hue depending on the value of the Bar:
+        if (value % 2 == 0):
+            i = value / 2
+            self.colorRed = 0.02 * i
+            self.colorBlue = 0.02 * i
+        if (value % 2 == 1):
+            i = int(value/2)
+            self.colorRed = 0.02 * (i+1)
+            self.colorBlue = 0.02 * i
+
+        # vertices of a Bar: x,y,z,r,g,b
+        # width of a bar is 0.05
         self.vertices = (
-            self.position,        -0.8,       0.0, 0.0, 0.0, 1.0,
-            self.position + 0.05, -0.8,       0.0, 0.0, 0.0, 1.0,
-            self.position + 0.05, self.value, 0.0, 1.0, 0.0, 0.0,
-            self.position,        self.value, 0.0, 1.0, 0.0, 0.0
+            self.position,        -0.8,       0.0, 0.0,           1.0,             0.0,
+            self.position + 0.05, -0.8,       0.0, 0.0,           1.0,             0.0,
+            self.position + 0.05, self.value, 0.0, self.colorRed, 0.0,  0.0,
+            self.position,        self.value, 0.0, self.colorRed, 0.0,  0.0
         )
 
         self.vertices = np.array(self.vertices, dtype=np.float32)
@@ -332,7 +388,7 @@ class Bar:
     
 
 #data = [-2, 45, 5, 11, -9]
-data = [1, 4, 0, 3, 2, 5]
+data = [10, 50, 0, 30, 20, 40, 88, 11, 43, 73, 98, 65, 7, 37, 18]
 
 if __name__ == "__main__":
     myApp = App(data)
